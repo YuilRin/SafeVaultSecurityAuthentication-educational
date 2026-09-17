@@ -39,6 +39,20 @@ public sealed class SecurityTests
     }
 
     [Test]
+    public void ValidUsernamePassesServerValidation()
+    {
+        Assert.That(RegistrationValidator.IsValid("alice_01", "alice@example.com", "StrongPassword1!"), Is.True);
+    }
+
+    [Test]
+    public void EmptyRequiredFieldsFailServerValidation()
+    {
+        Assert.That(RegistrationValidator.IsValid(string.Empty, "alice@example.com", "StrongPassword1!"), Is.False);
+        Assert.That(RegistrationValidator.IsValid("alice", string.Empty, "StrongPassword1!"), Is.False);
+        Assert.That(RegistrationValidator.IsValid("alice", "alice@example.com", string.Empty), Is.False);
+    }
+
+    [Test]
     public void ValidRegistrationInputPassesServerValidation()
     {
         Assert.That(RegistrationValidator.IsValid("alice_01", "alice@example.com", "StrongPassword1!"), Is.True);
@@ -68,6 +82,15 @@ public sealed class SecurityTests
     public async Task RegistrationRejectsSqlInjectionShapedUsername()
     {
         var result = await userService.RegisterAsync("' OR '1'='1", "alice@example.com", "StrongPassword1!");
+
+        Assert.That(result.Succeeded, Is.False);
+        Assert.That(await db.Users.CountAsync(), Is.Zero);
+    }
+
+    [Test]
+    public async Task RegistrationRejectsXssShapedUsername()
+    {
+        var result = await userService.RegisterAsync("<script>alert('XSS')</script>", "alice@example.com", "StrongPassword1!");
 
         Assert.That(result.Succeeded, Is.False);
         Assert.That(await db.Users.CountAsync(), Is.Zero);
