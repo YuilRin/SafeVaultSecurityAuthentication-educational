@@ -72,6 +72,24 @@ public sealed class AuthenticationAuthorizationTests
     }
 
     [Test]
+    public async Task LoginDoesNotRedirectToAnExternalReturnUrl()
+    {
+        await RegisterAsync("alice", "alice@example.com", "StrongPassword1!");
+        var token = await GetAntiForgeryTokenAsync("/Account/Login");
+
+        var response = await client.PostAsync("/Account/Login", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = token,
+            ["UsernameOrEmail"] = "alice",
+            ["Password"] = "StrongPassword1!",
+            ["returnUrl"] = "https://attacker.example/steal-session"
+        }));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+        Assert.That(response.Headers.Location?.ToString(), Is.EqualTo("/"));
+    }
+
+    [Test]
     public async Task UnauthenticatedUserIsRedirectedFromProtectedProfile()
     {
         var response = await client.GetAsync("/Profile");
