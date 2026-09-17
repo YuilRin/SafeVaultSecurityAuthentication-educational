@@ -29,10 +29,14 @@ public sealed class AuthenticationAuthorizationTests
     }
 
     [TearDown]
-    public void TearDown()
+    public async Task TearDown()
     {
         client.Dispose();
-        factory.Dispose();
+        await factory.DisposeAsync();
+        if (File.Exists(factory.DatabasePath))
+        {
+            File.Delete(factory.DatabasePath);
+        }
     }
 
     [Test]
@@ -170,6 +174,8 @@ public sealed class AuthenticationAuthorizationTests
     {
         private readonly string databasePath = Path.Combine(Path.GetTempPath(), $"safevault-{Guid.NewGuid():N}.db");
 
+        public string DatabasePath => databasePath;
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Development");
@@ -177,7 +183,7 @@ public sealed class AuthenticationAuthorizationTests
             {
                 configuration.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["ConnectionStrings:SafeVault"] = $"Data Source={databasePath}",
+                    ["ConnectionStrings:SafeVault"] = $"Data Source={databasePath};Pooling=False",
                     ["AdminSeed:Username"] = "admin",
                     ["AdminSeed:Email"] = "admin@example.com",
                     ["AdminSeed:Password"] = "AdminPassword1!"
@@ -187,17 +193,9 @@ public sealed class AuthenticationAuthorizationTests
             {
                 var descriptor = services.Single(item => item.ServiceType == typeof(DbContextOptions<SafeVaultDbContext>));
                 services.Remove(descriptor);
-                services.AddDbContext<SafeVaultDbContext>(options => options.UseSqlite($"Data Source={databasePath}"));
+                services.AddDbContext<SafeVaultDbContext>(options => options.UseSqlite($"Data Source={databasePath};Pooling=False"));
             });
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (disposing && File.Exists(databasePath))
-            {
-                File.Delete(databasePath);
-            }
-        }
     }
 }
