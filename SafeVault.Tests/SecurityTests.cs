@@ -114,7 +114,7 @@ public sealed class SecurityTests
     {
         await userService.RegisterAsync("alice", "alice@example.com", "StrongPassword1!");
 
-        var user = await userService.FindByUsernameAsync("' OR '1'='1");
+        var user = await userService.FindByUsernameOrEmailAsync("' OR '1'='1");
 
         Assert.That(user, Is.Null);
         Assert.That(await db.Users.CountAsync(), Is.EqualTo(1));

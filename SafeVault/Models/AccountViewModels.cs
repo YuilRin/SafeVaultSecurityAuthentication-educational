@@ -23,9 +23,9 @@ public sealed class RegisterViewModel
 
 public sealed class LoginViewModel
 {
-    [Required(ErrorMessage = "Username is required.")]
-    [StringLength(32)]
-    public string Username { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Username or email is required.")]
+    [StringLength(254)]
+    public string UsernameOrEmail { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required.")]
     [DataType(DataType.Password)]

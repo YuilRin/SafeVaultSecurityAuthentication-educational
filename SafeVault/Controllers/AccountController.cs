@@ -45,7 +45,7 @@ public sealed class AccountController(UserService userService, PasswordService p
             return View(model);
         }
 
-        var user = await userService.FindByUsernameAsync(model.Username.Trim(), cancellationToken);
+        var user = await userService.FindByUsernameOrEmailAsync(model.UsernameOrEmail.Trim(), cancellationToken);
         if (user is null || !passwordService.Verify(user, model.Password, user.PasswordHash))
         {
             ModelState.AddModelError(string.Empty, "Invalid username or password.");

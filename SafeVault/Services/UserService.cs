@@ -35,6 +35,8 @@ public sealed class UserService(SafeVaultDbContext db, PasswordService passwordS
         return (true, null);
     }
 
-    public Task<User?> FindByUsernameAsync(string username, CancellationToken cancellationToken = default) =>
-        db.Users.SingleOrDefaultAsync(user => user.Username == username, cancellationToken);
+    public Task<User?> FindByUsernameOrEmailAsync(string usernameOrEmail, CancellationToken cancellationToken = default) =>
+        db.Users.SingleOrDefaultAsync(
+            user => user.Username == usernameOrEmail || user.Email == usernameOrEmail,
+            cancellationToken);
 }
