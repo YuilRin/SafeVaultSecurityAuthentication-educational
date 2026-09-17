@@ -1,0 +1,6 @@
+<h1>SafeVault</h1>
+<p>A small account-management application for secure coding practice.</p>
+@if (User.Identity?.IsAuthenticated != true)
+{
+    <p><a asp-controller="Account" asp-action="Register">Create an account</a> or <a asp-controller="Account" asp-action="Login">log in</a>.</p>
+}

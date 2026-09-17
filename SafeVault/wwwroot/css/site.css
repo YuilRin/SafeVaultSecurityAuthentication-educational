@@ -1,0 +1,9 @@
+body { font-family: sans-serif; margin: 2rem auto; max-width: 58rem; line-height: 1.5; }
+nav { display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem; }
+form { display: grid; gap: .5rem; max-width: 28rem; }
+.inline-form { display: inline; }
+input { padding: .45rem; }
+button { width: fit-content; padding: .45rem .8rem; }
+.field-validation-error, .validation-summary-errors { color: #a00; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ccc; padding: .5rem; text-align: left; }
